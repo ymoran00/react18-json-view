@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
 import { ReactComponent as CopySVG } from '../svgs/copy.svg'
 import { ReactComponent as CopiedSVG } from '../svgs/copied.svg'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 
 export default function CopyButton({ node }: { node: any }) {
 	const { customizeCopy, CopyComponent, CopiedComponent } = useContext(JsonViewContext)

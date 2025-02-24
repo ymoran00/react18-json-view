@@ -1,4 +1,5 @@
-import JsonView, { defaultURLRegExp, JsonViewProps } from './components/json-view'
+import { defaultURLRegExp } from './components/json-context'
+import JsonView, { JsonViewProps } from './components/json-view'
 import { stringifyForCopying as stringify } from './utils'
 
 import { ReactComponent as EditSVG } from './svgs/edit.svg'

@@ -1,5 +1,5 @@
 import { useCallback, useContext, useState } from 'react'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 import { customCopy, objectSize, ifDisplay } from '../utils'
 import { ReactComponent as AngleDownSVG } from '../svgs/angle-down.svg'
 import CopyButton from './copy-button'
@@ -24,16 +24,23 @@ export default function LargeArrayNode({ originNode, node, depth, index, deleteH
 	// Edit property
 	const editHandle = useCallback(
 		(indexOrName: number | string, newValue: any, oldValue: any) => {
-			originNode[indexOrName as number] = newValue
-			if (onEdit)
-				onEdit({
+			const oldVal = originNode[indexOrName as number];
+			originNode[indexOrName as number] = newValue;
+			if (onEdit) {
+				const doEdit = onEdit({
 					newValue,
 					oldValue,
 					depth,
 					src,
 					indexOrName,
 					parentType: 'array'
-				})
+				});
+				if (doEdit === false) {
+					originNode[indexOrName as number] = oldVal;
+					forceUpdate();
+					return;
+				}
+			}
 			if (onChange) onChange({ type: 'edit', depth, src, indexOrName, parentType: 'array' })
 			forceUpdate()
 		},

@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 
 interface Props {
 	str: string

@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 import { isObject, customAdd, customCopy, customDelete, editableAdd, editableDelete, isCollapsed, objectSize, ifDisplay } from '../utils'
 import { ReactComponent as AngleDownSVG } from '../svgs/angle-down.svg'
 import CopyButton from './copy-button'
@@ -56,20 +56,33 @@ export default function ObjectNode({ node, depth, indexOrName, deleteHandle: _de
 	// Edit property
 	const editHandle = useCallback(
 		(indexOrName: number | string, newValue: any, oldValue: any) => {
+			let oldVal;
 			if (Array.isArray(node)) {
+				oldVal = node[+indexOrName];
 				node[+indexOrName] = newValue
 			} else if (node) {
+				oldVal = node[indexOrName];
 				node[indexOrName] = newValue
 			}
-			if (onEdit)
-				onEdit({
+			if (onEdit) {
+				const doEdit = onEdit({
 					newValue,
 					oldValue,
 					depth,
 					src,
 					indexOrName: indexOrName,
 					parentType: isPlainObject ? 'object' : 'array'
-				})
+				});
+				if (doEdit === false) {
+					if (Array.isArray(node)) {
+						node[+indexOrName] = oldVal
+					} else if (node) {
+						node[indexOrName] = oldVal
+					}
+					forceUpdate();
+					return;
+				}
+			}
 			if (onChange) onChange({ type: 'edit', depth, src, indexOrName: indexOrName, parentType: isPlainObject ? 'object' : 'array' })
 			forceUpdate()
 		},

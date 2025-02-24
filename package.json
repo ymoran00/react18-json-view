@@ -1,8 +1,11 @@
 {
-	"name": "react18-json-view",
-	"version": "0.2.9-canary.6",
+	"name": "@ymoran00/react18-json-view",
+	"version": "0.3.1",
 	"type": "module",
 	"description": "JSON viewer for react18",
+	"publishConfig": {
+		"access": "public"
+	},
 	"main": "dist/cjs/index.cjs",
 	"types": "dist/index",
 	"module": "dist/es/index.mjs",
@@ -84,13 +87,13 @@
 		"tree-view",
 		"treeview"
 	],
-	"homepage": "https://github.com/YYsuni/react18-json-view#readme",
+	"homepage": "https://github.com/ymoran00/react18-json-view#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/YYsuni/react18-json-view.git"
+		"url": "git+https://github.com/ymoran00/react18-json-view.git"
 	},
 	"bugs": {
-		"url": "https://github.com/YYsuni/react18-json-view/issues"
+		"url": "https://github.com/ymoran00/react18-json-view/issues"
 	},
 	"sideEffects": ["*.css"]
 }

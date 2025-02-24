@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 
 import JsonNode from './json-node'
 

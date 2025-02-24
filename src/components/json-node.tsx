@@ -1,5 +1,5 @@
 import { useContext, useRef, useState, isValidElement, useMemo, useCallback } from 'react'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 import {
 	customCopy,
 	customDelete,
@@ -9,7 +9,6 @@ import {
 	isObject,
 	isReactComponent,
 	safeCall,
-	stringifyForCopying,
 	resolveEvalFailedNewValue,
 	customMatchesURL
 } from '../utils'

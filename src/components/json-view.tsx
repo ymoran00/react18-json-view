@@ -1,74 +1,20 @@
-import { ReactElement, createContext, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import JsonNode from './json-node'
 import type { Collapsed, CustomizeCollapseStringUI, CustomizeNode, DisplaySize, Editable } from '../types'
 import { stringifyForCopying } from '../utils'
+import {defaultURLRegExp, JsonViewContext} from "./json-context";
 
-type OnEdit = (params: { newValue: any; oldValue: any; depth: number; src: any; indexOrName: string | number; parentType: 'object' | 'array' | null }) => void
-type OnDelete = (params: { value: any; indexOrName: string | number; depth: number; src: any; parentType: 'object' | 'array' | null }) => void
-type OnAdd = (params: { indexOrName: string | number; depth: number; src: any; parentType: 'object' | 'array' }) => void
-type OnChange = (params: {
+export type JVOnEdit = (params: { newValue: any; oldValue: any; depth: number; src: any; indexOrName: string | number; parentType: 'object' | 'array' | null }) => void | boolean
+export type JVOnDelete = (params: { value: any; indexOrName: string | number; depth: number; src: any; parentType: 'object' | 'array' | null }) => void
+export type JVOnAdd = (params: { indexOrName: string | number; depth: number; src: any; parentType: 'object' | 'array' }) => void
+export type JVOnChange = (params: {
 	indexOrName: string | number
 	depth: number
 	src: any
 	parentType: 'object' | 'array' | null
 	type: 'add' | 'edit' | 'delete'
 }) => void
-type OnCollapse = (params: { isCollapsing: boolean; node: Record<string, any> | Array<any>; indexOrName: string | number | undefined; depth: number }) => void
-
-export const defaultURLRegExp = /^(((ht|f)tps?):\/\/)?([^!@#$%^&*?.\s-]([^!@#$%^&*?.\s]{0,63}[^!@#$%^&*?.\s])?\.)+[a-z]{2,6}\/?/
-
-export const JsonViewContext = createContext({
-	src: undefined as any,
-
-	collapseStringsAfterLength: 99,
-	collapseStringMode: 'directly' as 'directly' | 'word' | 'address',
-	customizeCollapseStringUI: undefined as CustomizeCollapseStringUI | undefined,
-
-	collapseObjectsAfterLength: 20,
-	collapsed: false as Collapsed,
-	onCollapse: undefined as OnCollapse | undefined,
-	enableClipboard: true,
-
-	editable: false as Editable,
-	onEdit: undefined as OnEdit | undefined,
-	onDelete: undefined as OnDelete | undefined,
-	onAdd: undefined as OnAdd | undefined,
-	onChange: undefined as OnChange | undefined,
-
-	forceUpdate: () => {},
-
-	customizeNode: undefined as CustomizeNode | undefined,
-	customizeCopy: (() => {}) as (node: any) => any,
-
-	displaySize: undefined as DisplaySize,
-	displayArrayIndex: true,
-
-	matchesURL: false,
-	urlRegExp: defaultURLRegExp,
-
-	ignoreLargeArray: false,
-
-	CopyComponent: undefined as
-		| React.FC<{ onClick: (event: React.MouseEvent) => void; className: string }>
-		| React.Component<{ onClick: (event: React.MouseEvent) => void; className: string }>
-		| undefined,
-	CopiedComponent: undefined as
-		| React.FC<{ className: string; style: React.CSSProperties }>
-		| React.Component<{ className: string; style: React.CSSProperties }>
-		| undefined,
-	EditComponent: undefined as
-	| React.FC<{ onClick: (event: React.MouseEvent) => void; className: string }>
-	| React.Component<{ onClick: (event: React.MouseEvent) => void; className: string }>
-	| undefined,	
-	CancelComponent: undefined as
-	| React.FC<{ onClick: (event: React.MouseEvent) => void; className: string; style: React.CSSProperties }>
-	| React.Component<{ onClick: (event: React.MouseEvent) => void; className: string; style: React.CSSProperties }>
-	| undefined,
-	DoneComponent: undefined as
-	| React.FC<{ onClick: (event: React.MouseEvent) => void; className: string; style: React.CSSProperties }>
-	| React.Component<{ onClick: (event: React.MouseEvent) => void; className: string; style: React.CSSProperties }>
-	| undefined,
-})
+export type OnCollapse = (params: { isCollapsing: boolean; node: Record<string, any> | Array<any>; indexOrName: string | number | undefined; depth: number }) => void
 
 export interface JsonViewProps {
 	src: any
@@ -84,10 +30,10 @@ export interface JsonViewProps {
 	enableClipboard?: boolean
 
 	editable?: Editable
-	onEdit?: OnEdit
-	onDelete?: OnDelete
-	onAdd?: OnAdd
-	onChange?: OnChange
+	onEdit?: JVOnEdit
+	onDelete?: JVOnDelete
+	onAdd?: JVOnAdd
+	onChange?: JVOnChange
 
 	customizeNode?: CustomizeNode
 	customizeCopy?: (node: any) => any
@@ -219,16 +165,20 @@ export default function JsonView({
 					node={src}
 					depth={1}
 					editHandle={(indexOrName: number | string, newValue: any, oldValue: any) => {
-						setSrc(newValue)
-						if (onEdit)
-							onEdit({
+						if (onEdit) {
+							const doEdit = onEdit({
 								newValue,
 								oldValue,
 								depth: 1,
-								src,
+								src: newValue,
 								indexOrName: indexOrName,
 								parentType: null
-							})
+							});
+							if (doEdit === false) {
+								return;
+							}
+						}
+						setSrc(newValue)
 						if (onChange) onChange({ type: 'edit', depth: 1, src, indexOrName: indexOrName, parentType: null })
 					}}
 					deleteHandle={() => {

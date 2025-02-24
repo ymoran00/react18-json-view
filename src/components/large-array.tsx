@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import LargeArrayNode from './large-array-node'
-import { JsonViewContext } from './json-view'
+import { JsonViewContext } from './json-context'
 import { CustomizeOptions } from '../types'
 import { customAdd, customCopy, customDelete, editableAdd, editableDelete, ifDisplay, isCollapsed, isCollapsed_largeArray } from '../utils'
 import { ReactComponent as AngleDownSVG } from '../svgs/angle-down.svg'
